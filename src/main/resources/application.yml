@@ -1,0 +1,25 @@
+server:
+  port: 8081
+spring:
+  cloud:
+    gateway:
+      metrics:
+        enabled: true
+      routes:
+        - id: taperta
+          uri: http://127.0.0.1/webservice/
+          predicates:
+            - Path=/webservice/**
+        - id: root
+          uri: https://httpbin.org/
+          predicates:
+            - Path=/**
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
