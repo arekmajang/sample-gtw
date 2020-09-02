@@ -8,11 +8,12 @@ import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 
 @Component
-class TimerGlobalFilter(): GlobalFilter {
+class TimerGlobalFilter(val gtwService: GtwService): GlobalFilter {
 
     var log = LoggerFactory.getLogger(TimerGlobalFilter::class.java)
 
     override fun filter(exchange: ServerWebExchange, chain: GatewayFilterChain): Mono<Void> {
+        gtwService.incConcurrentRequest()
         val requestId = exchange.request.id
         val requestPath = exchange.request.path.toString()
         val startTime = System.currentTimeMillis()
@@ -20,10 +21,12 @@ class TimerGlobalFilter(): GlobalFilter {
                 .doOnSuccess {
                     val timeElapse = System.currentTimeMillis() - startTime
                     log.info("${requestId} - ${requestPath} success in ${timeElapse}")
+                    gtwService.decConcurrentRequest()
                 }
                 .doOnError {
                     val timeElapse = System.currentTimeMillis() - startTime
                     log.info("${requestId} - ${requestPath} error in ${timeElapse}")
+                    gtwService.decConcurrentRequest()
                 }
     }
 }

@@ -6,6 +6,7 @@ spring:
       metrics:
         enabled: true
       routes:
+        # TODO modify to tapera URL
         - id: taperta
           uri: http://127.0.0.1/webservice/
           predicates:
